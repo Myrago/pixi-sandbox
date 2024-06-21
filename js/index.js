@@ -1,3 +1,4 @@
+console.log(pixi_viewport);
 // class MobilePhone {
 //     constructor(name, price) {
 //         this.name = name;
@@ -21,33 +22,44 @@
 // iphone8.printName();
 // console.log(iphone9.cheaperThan(iphone5));
 
-let app;
-let player;
-let keys = {};
-let keysDiv;
 window.onload = async function () {
-    app = new PIXI.Application();
+    const app = new PIXI.Application();
+
+    console.log(app);
 
     await app.init({
-        width: 1600,
-        height: 1200,
+        width: 400,
+        height: 400,
         backgroundColor: 0xAAAAAA
     });
+
+    const viewport = new pixi_viewport.Viewport({events: app.renderer.events});
+
+    app.stage.addChild(viewport);
 
     // object
 
     document.body.appendChild(app.canvas);
 
+    const backgroundTexture = await PIXI.Assets.load("images/labyrinthe.png");
+    const background = new PIXI.Sprite(backgroundTexture);
 
-    const texture = await PIXI.Assets.load('images/paint.png');
-    const background = await PIXI.Assets.load("images/labyrinthe.png");
-    player = new PIXI.Sprite(texture);
+    viewport.addChild(background);
+
+    const playerTexture = await PIXI.Assets.load('images/paint.png');
+    const player = new PIXI.Sprite(playerTexture);
     player.interactive = true;
     player.anchor.set(0.5);
     player.x = app.view.width / 2;
     player.y = app.view.height / 2;
 
-    app.stage.addChild(player);
+    viewport.addChild(player);
+
+    viewport.follow(player, {
+        speed: 0,           // speed to follow in pixels/frame (0=teleport to location)
+        acceleration: null, // set acceleration to accelerate and decelerate at this rate; speed cannot be 0 to use acceleration
+        radius: null,       // radius (in world coordinates) of center circle where movement is allowed without moving the viewport
+    });
 
     //keyboard
 
@@ -56,13 +68,14 @@ window.onload = async function () {
 
     app.ticker.add(gameLoop);
 
-    keysDiv = document.querySelector("#keys");
+    const keysDiv = document.querySelector("#keys");
+    const keys = {};
 
     app.stage.interactive = false;
 
-    player.on("pointermove", movePlayer);
-    player.on("pointerenter", movePlayer);
-    player.on("pointerout", movePlayer);
+    // player.on("pointermove", movePlayer);
+    // player.on("pointerenter", movePlayer);
+    // player.on("pointerout", movePlayer);
 
     function keysDown(e) {
         console.log(e.KeyCode);
@@ -76,28 +89,25 @@ window.onload = async function () {
     function gameLoop() {
         keysDiv.innerHTML = JSON.stringify(keys);
         if (keys["38"]) {
-            player.y -= 5;
+            player.y -= 3
         }
 
         else if (keys["40"]) {
-            player.y += 5
+            player.y += 3
         }
 
         else if (keys["39"]) {
-            player.x += 5
+            player.x += 3
         }
 
         else if (keys["37"]) {
-            player.x -= 5
+            player.x -= 3
         }
     }
-
-
-}
-
-function movePlayer(e) {
-    let pos = e.data.global;
-
-    player.x = pos.x;
-    player.y = pos.y;
+    function movePlayer(e) {
+        let pos = e.data.global;
+    
+        player.x = pos.x;
+        player.y = pos.y;
+    }
 }
