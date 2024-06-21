@@ -25,8 +25,6 @@ console.log(pixi_viewport);
 window.onload = async function () {
     const app = new PIXI.Application();
 
-    console.log(app);
-
     await app.init({
         width: 400,
         height: 400,
@@ -48,18 +46,17 @@ window.onload = async function () {
 
     const playerTexture = await PIXI.Assets.load('images/paint.png');
     const player = new PIXI.Sprite(playerTexture);
-    player.interactive = true;
     player.anchor.set(0.5);
     player.x = app.view.width / 2;
     player.y = app.view.height / 2;
 
     viewport.addChild(player);
 
-    viewport.follow(player, {
-        speed: 0,           // speed to follow in pixels/frame (0=teleport to location)
-        acceleration: null, // set acceleration to accelerate and decelerate at this rate; speed cannot be 0 to use acceleration
-        radius: null,       // radius (in world coordinates) of center circle where movement is allowed without moving the viewport
-    });
+    // viewport.follow(player, {
+    //     speed: 0,           // speed to follow in pixels/frame (0=teleport to location)
+    //     acceleration: null, // set acceleration to accelerate and decelerate at this rate; speed cannot be 0 to use acceleration
+    //     radius: null,       // radius (in world coordinates) of center circle where movement is allowed without moving the viewport
+    // });
 
     //keyboard
 
@@ -70,8 +67,6 @@ window.onload = async function () {
 
     const keysDiv = document.querySelector("#keys");
     const keys = {};
-
-    app.stage.interactive = false;
 
     // player.on("pointermove", movePlayer);
     // player.on("pointerenter", movePlayer);
@@ -87,26 +82,25 @@ window.onload = async function () {
         keys[e.keyCode] = false;
     }
     function gameLoop() {
-        keysDiv.innerHTML = JSON.stringify(keys);
+        keysDiv.innerHTML = JSON.stringify(keys) + ` player position : ${player.x}, ${player.y}`;
         if (keys["38"]) {
-            player.y -= 3
+            background.y += 3;
         }
 
         else if (keys["40"]) {
-            player.y += 3
+            background.y -= 3;
         }
 
         else if (keys["39"]) {
-            player.x += 3
+            background.x -= 3;
         }
 
         else if (keys["37"]) {
-            player.x -= 3
+            background.x += 3;
         }
     }
     function movePlayer(e) {
         let pos = e.data.global;
-    
         player.x = pos.x;
         player.y = pos.y;
     }
